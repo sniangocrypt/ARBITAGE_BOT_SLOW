@@ -41,11 +41,9 @@ with open("venv\BINANCE.json", "w", encoding="utf-8") as file:
 	json.dump(price, file, ensure_ascii=False, indent=4)
 
 
-print(price_kukoin/price_binane)
 if (price_kukoin/price_binane) >= 1.05:
-	print(f"Разница в цене {tokenss} KUKOIN/BINANCE = {(price_kukoin/price_binane)}")
+	print(f"Разница в цене {tokenss} KUKOIN/BINANCE = {(((price_kukoin/price_binane)-1)*100)}%")
 elif (price_binane/price_kukoin) >= 1.05:
-	print(f"Разница в цене {tokenss} BINANCE/KUKOIN = {(price_binane/price_kukoin)}")
+	print(f"Разница в цене {tokenss} BINANCE/KUKOIN = {(((price_binane/price_kukoin)-1)*100)} %")
 else:
 	print(f"Арбтиража нет БЛЯТЬ, ищем дальше...")
-
