@@ -6,7 +6,7 @@ import json
 # tokens from excchenge
 
 tokens = ["BTC","ETH","SOL","XLM","DOGE"]
-tokenss = tokens[2]
+tokenss = tokens[0]
 
 # ПОЛУЧЕМ ЦЕНУ С КУКОИНА
 
@@ -47,7 +47,8 @@ if (price_kukoin/price_binane) >= 1.05:
 elif (price_binane/price_kukoin) >= 1.05:
 	print(f"Разница в цене {tokenss} BINANCE/KUKOIN = {(((price_binane/price_kukoin)-1)*100)} %")
 else:
-	print(f"Арбтиража нет БЛЯТЬ, ищем дальше...")
+	print(Fore.RED +f"Арбтиража нет БЛЯТЬ, ищем дальше...")
+	print()
 
 for i in range(4):
 	tokenss = tokens[i+1]
@@ -58,9 +59,10 @@ for i in range(4):
 	elif (price_binane / price_kukoin) >= 1.05:
 		print(f"Разница в цене {tokenss} BINANCE/KUKOIN = {(((price_binane / price_kukoin) - 1) * 100)} %")
 	else:
-		print(f"Арбтиража нет БЛЯТЬ, ищем дальше...")
+		print(Fore.RED +f"Арбтиража нет БЛЯТЬ, ищем дальше...")
+		print()
 		error = 1
 
 if error == 1:
-	print("ПИЗДЕЦ, ВЕЗДЕ ПУСТО...")
-
+	print()
+	print(Fore.RED +"ПИЗДЕЦ, ВЕЗДЕ ПУСТО...")
