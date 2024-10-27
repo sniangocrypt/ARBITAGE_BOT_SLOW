@@ -48,3 +48,19 @@ elif (price_binane/price_kukoin) >= 1.05:
 	print(f"Разница в цене {tokenss} BINANCE/KUKOIN = {(((price_binane/price_kukoin)-1)*100)} %")
 else:
 	print(f"Арбтиража нет БЛЯТЬ, ищем дальше...")
+
+for i in range(4):
+	tokenss = tokens[i+1]
+	print(Fore.GREEN + f"Цена {tokenss}  нa куоине {price}")
+	print(f"Цена {tokenss} на биненсе {BINANCE['price']}")
+	if (price_kukoin / price_binane) >= 1.05:
+		print(f"Разница в цене {tokenss} KUKOIN/BINANCE = {(((price_kukoin / price_binane) - 1) * 100)}%")
+	elif (price_binane / price_kukoin) >= 1.05:
+		print(f"Разница в цене {tokenss} BINANCE/KUKOIN = {(((price_binane / price_kukoin) - 1) * 100)} %")
+	else:
+		print(f"Арбтиража нет БЛЯТЬ, ищем дальше...")
+		error = 1
+
+if error == 1:
+	print("ПИЗДЕЦ, ВЕЗДЕ ПУСТО...")
+
