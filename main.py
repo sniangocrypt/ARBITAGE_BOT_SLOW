@@ -6,7 +6,7 @@ import json
 # tokens from excchenge
 
 tokens = ["BTC","ETH","SOL","XLM","DOGE"]
-tokenss = tokens[1]
+tokenss = tokens[2]
 
 # ПОЛУЧЕМ ЦЕНУ С КУКОИНА
 
@@ -20,7 +20,7 @@ for token in r["data"]["ticker"]:
 	symbol = token["symbol"]
 	price = token["last"]
 	if symbol == SYMBOL:
-		print(Fore.GREEN +f"Цена  нa куоине {price}")
+		print(Fore.GREEN +f"Цена {tokenss}  нa куоине {price}")
 		price_kukoin = float(price)
 	with open("venv\kukoin.json", "w", encoding="utf-8") as file:
 		json.dump(price, file, ensure_ascii=False, indent=4)
@@ -36,9 +36,10 @@ params = SYMBOL_BINANCE
 response_binance = requests.get(url= url, params = params)
 BINANCE = response_binance.json()
 price_binane = float(BINANCE['price'])
-print(f"Цена на биненсе {BINANCE['price']}")
+print(f"Цена {tokenss} на биненсе {BINANCE['price']}")
 with open("venv\BINANCE.json", "w", encoding="utf-8") as file:
 	json.dump(price, file, ensure_ascii=False, indent=4)
+
 
 
 if (price_kukoin/price_binane) >= 1.05:
