@@ -1,56 +1,64 @@
 import requests
-import requests
+from collections import OrderedDict
 from colorama import Fore, Back, Style
 import json
 
-# tokens from excchenge
-
-tokens = ["BTC","ETH","SOL","XLM","DOGE"]
-# ПОЛУЧЕМ ЦЕНУ С КУКОИНА
-for k in tokens:
-	SYMBOL = f"{tokens[0]}-USDT"
-	url = f"https://api.kucoin.com/api/v1/market/allTickers"
-	response = requests.get(url)
-	r = response.json()
-	for token in r["data"]["ticker"]:
-		symbol = token["symbol"]
-		price = token["last"]
-		if symbol == SYMBOL:
-			price_kukoin = float(price)
-		with open("venv\kukoin.json", "w", encoding="utf-8") as file:
-			json.dump(token["last"], file, ensure_ascii=False, indent=4)
+tokens = ["BTC", "ETH", "SOL", "XLM", "DOGE", "TON", "MOVR"]
 
 
-# ПОЛУЧЕМ ЦЕНУ С БИНАНСА
-
-for q in tokens:
-	SYMBOL_BINANCE = {
-  	"symbol": f"{tokens[0]}USDT",
-	}
-#f""symbol"': "{tokens[1]}USDT""
-	url = "https://api.binance.com/api/v3/ticker/price"
-	params = SYMBOL_BINANCE
-	response_binance = requests.get(url= url, params = params)
-	BINANCE = response_binance.json()
-	price_binane = float(BINANCE['price'])
-	with open("venv\BINANCE.json", "w", encoding="utf-8") as file:
-		json.dump(BINANCE['price'], file, ensure_ascii=False, indent=4)
+def parse_kucoin():
+	kucoin_dict = {}
+	kucoin_url = f"https://api.kucoin.com/api/v1/market/allTickers"
+	kucoin_response = requests.get(url=kucoin_url)
+	data = kucoin_response.json()
+	kucoin_response.close()
+	for ticker in data['data']['ticker']:
+		if ticker['symbol'][:-5] in tokens and ticker['symbol'][-5:] == "-USDT":
+			kucoin_dict[ticker['symbol']] = ticker['last']
+	with open("Kucoin.json", "w", encoding="utf-8") as file:
+		json.dump(kucoin_dict, file, ensure_ascii=True, indent=4)
+	return kucoin_dict
 
 
+def parse_binance():
+	binance_dict = {}
+	binance_url = "https://api.binance.com/api/v3/ticker/price"
+	binance_response = requests.get(url=binance_url)
+	data = binance_response.json()
+	binance_response.close()
+	for ticker in data:
+		for token in tokens:
+			if ticker['symbol'] == f"{token}USDT":
+				binance_dict[ticker['symbol']] = ticker['price']
+				break
+	with open("Binance.json", "w", encoding="utf-8") as file:
+		json.dump(binance_dict, file, ensure_ascii=True, indent=4)
+	return binance_dict
 
-for i in range(5):
-	tokenss = tokens[i]
-	print(Fore.GREEN + f"Цена {tokenss}  нa куоине {price}")
-	print(f"Цена {tokenss} на биненсе {BINANCE['price']}")
-	if (price_kukoin / price_binane) >= 1.05:
-		print(f"Разница в цене {tokenss} KUKOIN/BINANCE = {(((price_kukoin / price_binane) - 1) * 100)}%")
-	elif (price_binane / price_kukoin) >= 1.05:
-		print(f"Разница в цене {tokenss} BINANCE/KUKOIN = {(((price_binane / price_kukoin) - 1) * 100)} %")
-	else:
-		print(Fore.RED +f"Арбтиража нет БЛЯТЬ, ищем дальше...")
-		print()
-		error = 1
 
-if error == 1:
-	print()
-	print(Fore.RED +"ПИЗДЕЦ, ВЕЗДЕ ПУСТО...")
+def calculate_spread(binance_data: dict, kucoin_data: dict):
+	if (not binance_data) or (not kucoin_data):
+		print("Не удалось получить цены по токенам с одной из бирж! Расчет спреда невозможен!")
+		return None
+	sorted_binance_data = OrderedDict(sorted(binance_data.items()))
+	sorted_kucoin_data = OrderedDict(sorted(kucoin_data.items()))
+	for binance_token, kucoin_token in zip(sorted_binance_data, sorted_kucoin_data):
+		if binance_token == kucoin_token.replace("-", ""):
+			print(Fore.RED + f"Рассматриваем тикер: {binance_token}")
+			if float(sorted_binance_data[binance_token]) / float(sorted_kucoin_data[kucoin_token]) >= 1.001:
+				print("Направление Kucoin -> Binance")
+				print(f"Профит в %: {(float(sorted_binance_data[binance_token]) / float(sorted_kucoin_data[kucoin_token]) - 1) * 100}%")
+				print(f"Профит в $: {float(sorted_binance_data[binance_token]) - float(sorted_kucoin_data[kucoin_token])}$")
+			elif float(sorted_kucoin_data[kucoin_token]) / float(sorted_binance_data[binance_token]) >= 1.001:
+				print("Направление Binance -> Kucoin")
+				print(f"Профит в %: {(float(sorted_kucoin_data[kucoin_token]) / float(sorted_binance_data[binance_token]) - 1) * 100}%")
+				print(f"Профит в $: {float(sorted_kucoin_data[kucoin_token]) - float(sorted_binance_data[binance_token])}$")
+			else:
+				print(Fore.RED + f"Арбтиража нет БЛЯТЬ, ищем дальше...")
+			print("="*20)
+
+
+def main():
+	calculate_spread(parse_binance(), parse_kucoin())
+
+main()
